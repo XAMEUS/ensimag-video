@@ -12,6 +12,11 @@ pthread_mutex_t fen;
 int fen_envoyee = 0;
 int text_fen_prete = 0;
 
+int taille_buffer = 0;
+pthread_cond_t veut_deposer_texture = PTHREAD_COND_INITIALIZER;
+pthread_cond_t veut_prendre_texture = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t verrou_texture;
+
 
 /* l'implantation des fonctions de synchro ici */
 void envoiTailleFenetre(th_ycbcr_buffer buffer) {
@@ -46,14 +51,24 @@ void attendreFenetreTexture() {
 
 
 void debutConsommerTexture() {
+    pthread_mutex_lock(&verrou_texture);
+    while(taille_buffer < 1) pthread_cond_wait(&veut_prendre_texture, &verrou_texture);
 }
 
 void finConsommerTexture() {
+    taille_buffer--;
+    pthread_cond_broadcast(&veut_deposer_texture);
+    pthread_mutex_unlock(&verrou_texture);
 }
 
 
 void debutDeposerTexture() {
+    pthread_mutex_lock(&verrou_texture);
+    while(taille_buffer >= NBTEX) pthread_cond_wait(&veut_deposer_texture, &verrou_texture);
 }
 
 void finDeposerTexture() {
+    taille_buffer++;
+    pthread_cond_broadcast(&veut_prendre_texture);
+    pthread_mutex_unlock(&verrou_texture);
 }
