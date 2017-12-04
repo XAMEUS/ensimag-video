@@ -151,7 +151,7 @@ int decodeAllHeaders(int respac, struct streamstate *s, enum streamtype type) {
 
 	    if (type == TYPE_THEORA) {
 		// lancement du thread gérant l'affichage (draw2SDL)
-	    assert(!pthread_create(&theora2sdlthread, NULL, draw2SDL, (void*) (&s->serial)));
+	    assert(!pthread_create(&theora2sdlthread, NULL, draw2SDL, (int*) (long long int) (&s->serial)));
 
 		assert(res == 0);
 	    }
