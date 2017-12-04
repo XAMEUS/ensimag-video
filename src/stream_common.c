@@ -67,19 +67,29 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
 
 	// proteger l'accès à la hashmap
 
-	if (type == TYPE_THEORA)
-	    HASH_ADD_INT( theorastrstate, serial, s );
-	else
-	    HASH_ADD_INT( vorbisstrstate, serial, s );
-
+	if (type == TYPE_THEORA) {
+        pthread_mutex_lock(&m_theorastrstate);
+        HASH_ADD_INT( theorastrstate, serial, s );
+        pthread_mutex_unlock(&m_theorastrstate);
+    }
+	else {
+        pthread_mutex_lock(&m_vorbisstrstate);
+        HASH_ADD_INT( vorbisstrstate, serial, s );
+        pthread_mutex_unlock(&m_vorbisstrstate);
+    }
     } else {
 	// proteger l'accès à la hashmap
 
-	if (type == TYPE_THEORA)
-	    HASH_FIND_INT( theorastrstate, & serial, s );
-	else
-	    HASH_FIND_INT( vorbisstrstate, & serial, s );
-
+	if (type == TYPE_THEORA) {
+        pthread_mutex_lock(&m_theorastrstate);
+        HASH_FIND_INT( theorastrstate, & serial, s );
+        pthread_mutex_unlock(&m_theorastrstate);
+    }
+	else {
+        pthread_mutex_lock(&m_vorbisstrstate);
+        HASH_FIND_INT( vorbisstrstate, & serial, s );
+        pthread_mutex_unlock(&m_vorbisstrstate);
+    }
 	assert(s != NULL);
     }
     assert(s != NULL);

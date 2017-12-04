@@ -3,6 +3,8 @@
 
 #include "ensivideo.h"
 
+extern pthread_mutex_t m_theorastrstate, m_vorbisstrstate;
+
 extern bool fini;
 extern pthread_t theora2sdlthread;
 extern struct timespec datedebut;

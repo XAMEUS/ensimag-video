@@ -12,6 +12,7 @@ SDL_AudioSpec want = {};
 SDL_AudioSpec have = {};
 
 struct streamstate *vorbisstrstate=NULL;
+pthread_mutex_t m_vorbisstrstate;
 
 void vorbis2SDL(struct streamstate *s) {
     static long long int nbsamplesbytes = 0;
@@ -22,14 +23,14 @@ void vorbis2SDL(struct streamstate *s) {
 	want.channels = s->vo_dec.info.channels;
 	want.samples = 4096;
 	want.callback = NULL;
-	
+
 	audioid = SDL_OpenAudioDevice(NULL, false, & want, & have, 0 );
 	SDL_PauseAudioDevice(audioid, 0);
 	// start point
 	clock_gettime( CLOCK_REALTIME, & datedebut);
     }
     assert(audioid);
-    
+
 
     if (vorbis_synthesis( & s->vo_dec.block, &s->packet) == 0) {
 	int res = vorbis_synthesis_blockin(& s->vo_dec.dsp,
@@ -44,11 +45,11 @@ void vorbis2SDL(struct streamstate *s) {
 	for(int sa=0, idx=0; sa < samples; sa++)
 	    for(int c=0; c < s->vo_dec.info.channels; c++, idx++)
 		tmpbuff[idx] = pcm[c][sa];
-		
+
 	SDL_QueueAudio(audioid, tmpbuff,
 		       samples * s->vo_dec.info.channels * sizeof(float));
 	nbsamplesbytes += samples * s->vo_dec.info.channels * sizeof(float);
-	free(tmpbuff);	    
+	free(tmpbuff);
 	int res = vorbis_synthesis_read(& s->vo_dec.dsp, samples);
 	assert(res == 0);
     }
