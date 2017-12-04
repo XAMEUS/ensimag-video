@@ -3,7 +3,7 @@
 
 #include "ensivideo.h"
 
-extern pthread_mutex_t m_theorastrstate, m_vorbisstrstate;
+extern pthread_mutex_t hash_mutex;
 
 extern bool fini;
 extern pthread_t theora2sdlthread;

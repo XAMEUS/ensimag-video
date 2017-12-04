@@ -67,29 +67,25 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
 
 	// proteger l'accès à la hashmap
 
+    pthread_mutex_lock(&hash_mutex);
 	if (type == TYPE_THEORA) {
-        pthread_mutex_lock(&m_theorastrstate);
         HASH_ADD_INT( theorastrstate, serial, s );
-        pthread_mutex_unlock(&m_theorastrstate);
     }
 	else {
-        pthread_mutex_lock(&m_vorbisstrstate);
         HASH_ADD_INT( vorbisstrstate, serial, s );
-        pthread_mutex_unlock(&m_vorbisstrstate);
     }
+    pthread_mutex_unlock(&hash_mutex);
     } else {
 	// proteger l'accès à la hashmap
 
+    pthread_mutex_lock(&hash_mutex);
 	if (type == TYPE_THEORA) {
-        pthread_mutex_lock(&m_theorastrstate);
         HASH_FIND_INT( theorastrstate, & serial, s );
-        pthread_mutex_unlock(&m_theorastrstate);
     }
 	else {
-        pthread_mutex_lock(&m_vorbisstrstate);
         HASH_FIND_INT( vorbisstrstate, & serial, s );
-        pthread_mutex_unlock(&m_vorbisstrstate);
     }
+    pthread_mutex_unlock(&hash_mutex);
 	assert(s != NULL);
     }
     assert(s != NULL);
@@ -151,7 +147,7 @@ int decodeAllHeaders(int respac, struct streamstate *s, enum streamtype type) {
 
 	    if (type == TYPE_THEORA) {
 		// lancement du thread gérant l'affichage (draw2SDL)
-	    assert(!pthread_create(&theora2sdlthread, NULL, draw2SDL, (int*) (long long int) (&s->serial)));
+	    assert(!pthread_create(&theora2sdlthread, NULL, draw2SDL, (int*) (long long int) (s->serial)));
 
 		assert(res == 0);
 	    }

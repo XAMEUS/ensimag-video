@@ -19,7 +19,7 @@ struct TextureDate texturedate[NBTEX] = {};
 SDL_Rect rect = {};
 
 struct streamstate *theorastrstate=NULL;
-pthread_mutex_t m_theorastrstate = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t hash_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void *draw2SDL(void *arg) {
     int serial = (int) (long long int) arg;
@@ -63,11 +63,11 @@ void *draw2SDL(void *arg) {
     signalerFenetreEtTexturePrete();
 
     /* Protéger l'accès à la hashmap */
-    pthread_mutex_lock(&m_theorastrstate);
+    pthread_mutex_lock(&hash_mutex);
     HASH_FIND_INT( theorastrstate, &serial, s );
-    pthread_mutex_unlock(&m_theorastrstate);
+    pthread_mutex_unlock(&hash_mutex);
 
-    assert(!s || s->strtype == TYPE_THEORA);
+    assert(s && s->strtype == TYPE_THEORA);
 
     while(! fini) {
 	// récupérer les évenements de fin
