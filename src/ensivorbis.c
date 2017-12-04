@@ -1,5 +1,6 @@
 #include <time.h>
 #include <assert.h>
+#include <pthread.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_audio.h>
 #include "ensivideo.h"
@@ -12,7 +13,7 @@ SDL_AudioSpec want = {};
 SDL_AudioSpec have = {};
 
 struct streamstate *vorbisstrstate=NULL;
-pthread_mutex_t m_vorbisstrstate;
+pthread_mutex_t m_vorbisstrstate = PTHREAD_MUTEX_INITIALIZER;
 
 void vorbis2SDL(struct streamstate *s) {
     static long long int nbsamplesbytes = 0;
